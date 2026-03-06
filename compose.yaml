@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Nasz Event Store (Źródło prawdy dla DDD)
+  postgres:
+    image: postgres:15-alpine
+    container_name: eam-db
+    environment:
+      POSTGRES_DB: eam_simulator
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  # Nasz Read Model i Spatial Index (Szybkie dane dla frontendu)
+  redis:
+    image: redis:7-alpine
+    container_name: eam-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+
+  # Opcjonalnie: GUI do podglądu Redisa (bardzo ułatwia debugowanie!)
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: eam-redis-insight
+    ports:
+      - "8001:8001"
