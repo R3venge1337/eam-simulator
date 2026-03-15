@@ -11,6 +11,7 @@
 	<groupId>com.eam</groupId>
 	<artifactId>eam-simulator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<name>eam-simulator</name>
 	<description>EAM Simulator - Core Platform</description>
 	<url/>
