@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     // Budujemy obraz, wskazując na Dockerfile w root
-                    // Dockerfile musi kopiować JAR z eam-app/target/
+                    // Dockerfile musi kopiować JAR z eam-monolith/target/
                     sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
                     sh "docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${IMAGE_NAME}:latest"
                 }

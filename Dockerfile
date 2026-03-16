@@ -6,7 +6,7 @@ RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
 # Kopiujemy JAR z folderu modułu eam-app
-ARG JAR_FILE=eam-app/target/*.jar
+ARG JAR_FILE=eam-monolith/target/*.jar
 COPY ${JAR_FILE} app.jar
 
 EXPOSE 8080
