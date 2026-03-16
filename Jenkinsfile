@@ -57,15 +57,22 @@ pipeline {
                        }
                    }
                }
-               stage('Deploy to MicroK8s') {
-                           steps {
-                               script {
-                                   // To założy, że Jenkins ma uprawnienia do microk8s kubectl
-                                   sh "microk8s kubectl set image deployment/eam-simulator eam-simulator=${IMAGE_NAME}:${BUILD_NUMBER}"
-                                   sh "microk8s kubectl rollout status deployment/eam-simulator"
-                               }
-                           }
-                       }
+              stage('Deploy to MicroK8s') {
+                          steps {
+                              script {
+                                  // 1. Aplikujemy całą konfigurację (Deployment, Service, itd.)
+                                  // Ścieżka 'k8s/eam-all.yaml' zakłada, że plik jest w folderze k8s w repozytorium
+                                  sh "microk8s kubectl apply -f k8s/eam-all.yaml"
+
+                                  // 2. Wymuszamy aktualizację obrazu na ten, który przed chwilą zbudowaliśmy
+                                  // To jest kluczowe, bo jeśli używasz tagu 'latest', K8s mógłby nie zauważyć zmiany
+                                  sh "microk8s kubectl set image deployment/eam-simulator eam-simulator=${IMAGE_NAME}:${BUILD_NUMBER}"
+
+                                  // 3. Czekamy na zakończenie wdrażania (jeśli coś pójdzie nie tak, Jenkins oznaczy build jako błąd)
+                                  sh "microk8s kubectl rollout status deployment/eam-simulator"
+                              }
+                          }
+                      }
     }
 
     post {
