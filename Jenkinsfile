@@ -41,17 +41,31 @@ pipeline {
             }
         }
 
-        stage('Docker Push') {
-            steps {
-                script {
-                    // Logowanie i wysyłka do Docker Hub
-                    docker.withRegistry('', DOCKER_CREDS) {
-                        sh "docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
-                        sh "docker push ${IMAGE_NAME}:latest"
-                    }
-                }
-            }
-        }
+       stage('Docker Push') {
+                   steps {
+                       script {
+                           // Jawnie podajemy URL do Docker Hub i używamy ID Twoich poświadczeń
+                           docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDS) {
+                               def img = docker.image("${IMAGE_NAME}:${BUILD_NUMBER}")
+
+                               // Pushuje tag z numerem buildu
+                               img.push()
+
+                               // Pushuje tag 'latest'
+                               img.push('latest')
+                           }
+                       }
+                   }
+               }
+               stage('Deploy to MicroK8s') {
+                           steps {
+                               script {
+                                   // To założy, że Jenkins ma uprawnienia do microk8s kubectl
+                                   sh "microk8s kubectl set image deployment/eam-simulator eam-simulator=${IMAGE_NAME}:${BUILD_NUMBER}"
+                                   sh "microk8s kubectl rollout status deployment/eam-simulator"
+                               }
+                           }
+                       }
     }
 
     post {
