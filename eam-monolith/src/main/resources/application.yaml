@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: eam-simulator
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,gamestatus"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%thread] %logger{36} : %m%n"
+  level:
+    com.eam_simulator.engine: DEBUG
+    org.springframework.web: DEBUG
+
+
+
