@@ -48,8 +48,11 @@ class GameLoop {
     }
 
     private void processTick() {
+        long startTime = System.nanoTime();
+
         tickCount++;
         TickEmitted tick = new TickEmitted(tickCount, 1.0 / 60.0, Instant.now());
+
         tickables.forEach(tickable -> {
             try {
                 tickable.onTick(tick);
@@ -58,6 +61,10 @@ class GameLoop {
                         tickCount, tickable.getClass().getSimpleName(), e);
             }
         });
+
+        long endTime = System.nanoTime();
+
+        metrics.recordTick(endTime - startTime);
     }
 
     void stop() {
