@@ -27,7 +27,7 @@ class GameEngineTest {
     void shouldStartEngineAndNotifyTickables() {
         long initialTicks = tickCounter.getTickCount();
 
-        gameEngineFacade.notifyWorldReady();
+        gameEngineFacade.startSimulation();
 
         await()
                 .atMost(5, SECONDS)
