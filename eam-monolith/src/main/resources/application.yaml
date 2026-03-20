@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: eam-simulator
+
+engine:
+  async:
+    core-pool-size: 2
+    max-pool-size: 5
+    queue-capacity: 10
+    thread-prefix: "GameEngine-"
+    await-termination-seconds: 30
+  simulation:
+    target-fps: 60
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,gamestatus"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%thread] %logger{36} : %m%n"
+  level:
+    root: INFO
+    com.eam_simulator.engine: DEBUG
+    org.springframework.web: INFO
