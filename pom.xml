@@ -85,7 +85,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven.compiler}</version>
 				<configuration>
-				<release>25</release>
+				<release>${java.version}</release>
 				<annotationProcessorPaths>
 					<path>
 						<groupId>org.projectlombok</groupId>
