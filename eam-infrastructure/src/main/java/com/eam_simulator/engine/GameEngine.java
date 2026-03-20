@@ -32,4 +32,14 @@ class GameEngine implements GameEngineFacade {
             log.warn("Game Engine: Received 'World Ready' signal but engine is already running. Ignoring.");
         }
     }
+    @Override
+    public void stop() {
+        log.info("Game Engine: Requesting shutdown...");
+        gameLoop.stop();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return isStarted.get();
+    }
 }
