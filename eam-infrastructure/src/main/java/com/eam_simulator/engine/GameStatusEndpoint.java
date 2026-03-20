@@ -13,15 +13,19 @@ import java.util.Map;
 class GameStatusEndpoint {
 
     private final GameEngineMetrics metrics;
+    private final GameEngineFacade engineFacade;
 
     @ReadOperation
     Map<String, Object> getStatus() {
+        double lastTickMs = metrics.getLastTickDurationMs().get();
+        double TARGET_TICK_MS = 16.666666666666668;
+
         return Map.of(
-                "status", "RUNNING",
+                "status", engineFacade.isRunning() ? "RUNNING" : "STOPPED",
                 "current_ups", metrics.getLastFps().get(),
                 "avg_tick_duration_ms", String.format("%.3f", metrics.getLastTickDurationMs().get()),
                 "total_ticks", metrics.getTotalTicks().get(),
-                "load_percent", String.format("%.2f%%", (metrics.getLastTickDurationMs().get() / 16.67) * 100)
+                "load_factor", lastTickMs / TARGET_TICK_MS
         );
     }
 }
