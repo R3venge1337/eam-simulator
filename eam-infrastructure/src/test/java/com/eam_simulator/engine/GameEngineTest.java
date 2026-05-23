@@ -34,7 +34,6 @@ class GameEngineTest {
     void shouldStartEngineAndNotifyTickables() {
         long initialTicks = tickCounter.getTickCount();
 
-        // Używamy nowej, lepszej nazwy metody
         gameEngineFacade.startSimulation();
 
         await()
