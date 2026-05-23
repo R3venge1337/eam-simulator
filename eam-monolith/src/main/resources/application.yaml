@@ -1,10 +1,32 @@
 server:
   port: 8080
+  servlet:
+    context-path: /api
 
 spring:
   application:
     name: eam-simulator
+    # ===================================================================
+    # (H2 In-Memory)
+    # ===================================================================
+    datasource:
+      url: jdbc:h2:mem:eam_db
+      driver-class-name: org.h2.Driver
+      username: sa
+      password: ""
 
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+      open-in-view: false
+    h2:
+      console:
+        enabled: true
+        path: /h2-console
 engine:
   async:
     core-pool-size: 2
