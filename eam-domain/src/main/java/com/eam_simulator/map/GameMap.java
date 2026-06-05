@@ -1,8 +1,13 @@
 package com.eam_simulator.map;
 
-import com.eam_simulator.engine.BaseAggregateRoot;
-import com.eam_simulator.engine.entities.Coordinates;
-import com.eam_simulator.engine.event.MapCreatedEvent;
+import com.eam_simulator.domain.BaseAggregateRoot;
+import com.eam_simulator.domain.DomainErrorMessages;
+import com.eam_simulator.domain.map.entities.Coordinates;
+import com.eam_simulator.domain.map.entities.GenerationStatus;
+import com.eam_simulator.domain.map.event.MapCreatedEvent;
+import com.eam_simulator.domain.map.event.MapEnvironmentGeneratedEvent;
+import com.eam_simulator.domain.map.exceptions.InvalidCoordinatesException;
+import com.eam_simulator.domain.map.exceptions.InvalidElevationLevelException;
 
 import java.util.UUID;
 
@@ -31,6 +36,42 @@ class GameMap extends BaseAggregateRoot {
         this.grid = grid;
     }
 
+    public void applyModification(TerrainModification modification) {
+        if (modification == null) {
+            return;
+        }
+
+        Coordinates coords = modification.coordinates();
+
+        if (isOutOfBounds(coords)) {
+            throw new InvalidCoordinatesException(coords.x(), coords.y());
+        }
+
+        if (modification.elevation() < 0) {
+            throw new InvalidElevationLevelException(DomainErrorMessages.INVALID_ELEVATION_LEVEL);
+        }
+
+        Tile tile = this.grid[coords.x()][coords.y()];
+        tile.shapeTerrain(modification.terrainType(), modification.elevation(), modification.passageType(), modification.isWalkable());
+    }
+
+    private boolean isOutOfBounds(Coordinates coords) {
+        return coords.x() < 0 || coords.x() >= size.width() ||
+                coords.y() < 0 || coords.y() >= size.height();
+    }
+
+    public void startEnvironmentGeneration() {
+        this.registerEvent(new MapEnvironmentGeneratedEvent(super.getId(), GenerationStatus.UNDER_CONSTRUCTION));
+    }
+
+    public void completeEnvironmentGeneration() {
+        this.registerEvent(new MapEnvironmentGeneratedEvent(super.getId(), GenerationStatus.CREATED));
+    }
+
+    public void failedEnvironmentGeneration() {
+        this.registerEvent(new MapEnvironmentGeneratedEvent(super.getId(), GenerationStatus.FAILED));
+    }
+
     public MapName getMapName() {
         return mapName;
     }
@@ -39,7 +80,7 @@ class GameMap extends BaseAggregateRoot {
         return size;
     }
 
-    public Tile[][] getGrid() {
+    Tile[][] getGrid() {
         return grid;
     }
 }
