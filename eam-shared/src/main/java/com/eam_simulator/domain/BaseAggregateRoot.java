@@ -1,13 +1,11 @@
-package com.eam_simulator.engine;
-
-import com.eam_simulator.engine.exceptions.AggregateIdNotFoundException;
+package com.eam_simulator.domain;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static com.eam_simulator.engine.exceptions.DomainErrorMessages.AGGREGATE_ID_NOT_FOUND;
+import static com.eam_simulator.domain.DomainErrorMessages.AGGREGATE_ID_NOT_FOUND;
 
 public abstract class BaseAggregateRoot implements AggregateRoot {
     private final UUID id;

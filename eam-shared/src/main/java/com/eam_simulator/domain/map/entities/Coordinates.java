@@ -1,6 +1,6 @@
-package com.eam_simulator.engine.entities;
+package com.eam_simulator.domain.map.entities;
 
-import com.eam_simulator.engine.exceptions.InvalidCoordinatesException;
+import com.eam_simulator.domain.map.exceptions.InvalidCoordinatesException;
 
 import java.io.Serializable;
 

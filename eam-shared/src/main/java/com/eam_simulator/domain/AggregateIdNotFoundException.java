@@ -1,4 +1,4 @@
-package com.eam_simulator.engine.exceptions;
+package com.eam_simulator.domain;
 
 public class AggregateIdNotFoundException extends DomainException {
     public AggregateIdNotFoundException(String message) {

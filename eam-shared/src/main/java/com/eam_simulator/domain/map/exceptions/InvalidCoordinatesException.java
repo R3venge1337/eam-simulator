@@ -1,4 +1,7 @@
-package com.eam_simulator.engine.exceptions;
+package com.eam_simulator.domain.map.exceptions;
+
+import com.eam_simulator.domain.DomainErrorMessages;
+import com.eam_simulator.domain.DomainException;
 
 public class InvalidCoordinatesException extends DomainException {
 
