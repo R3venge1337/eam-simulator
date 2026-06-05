@@ -1,8 +1,8 @@
 package com.eam_simulator.map;
 
-import com.eam_simulator.engine.event.MapCreatedEvent;
-import com.eam_simulator.engine.exceptions.EmptyFieldException;
-import com.eam_simulator.engine.exceptions.InvalidMapSizeException;
+import com.eam_simulator.domain.map.event.MapCreatedEvent;
+import com.eam_simulator.domain.map.exceptions.EmptyFieldException;
+import com.eam_simulator.domain.map.exceptions.InvalidMapSizeException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
