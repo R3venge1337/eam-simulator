@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 class MapRestController {
 
     private final MapFacade mapFacade;
+    private final MapRequestMapper mapRequestMapper;
 
     @PostMapping
     public ResponseEntity<CreateMapResponse> createMap(@RequestBody CreateMapRequest request) {
-        MapView mapView = mapFacade.generateInitialWorld(new CreateMapCommand(request.mapName(), request.size()));
+        CreateMapCommand command = mapRequestMapper.toCommand(request);
+        MapView mapView = mapFacade.generateInitialWorld(command);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
