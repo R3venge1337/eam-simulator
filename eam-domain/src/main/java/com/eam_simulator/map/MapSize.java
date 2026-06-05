@@ -1,6 +1,6 @@
 package com.eam_simulator.map;
 
-import com.eam_simulator.engine.exceptions.InvalidMapSizeException;
+import com.eam_simulator.domain.map.exceptions.InvalidMapSizeException;
 
 record MapSize(int width, int height) {
     public MapSize {
