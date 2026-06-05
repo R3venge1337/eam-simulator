@@ -1,7 +1,7 @@
 package com.eam_simulator.map;
 
-import com.eam_simulator.engine.exceptions.DomainErrorMessages;
-import com.eam_simulator.engine.exceptions.EmptyFieldException;
+import com.eam_simulator.domain.DomainErrorMessages;
+import com.eam_simulator.domain.map.exceptions.EmptyFieldException;
 
 import java.util.Objects;
 
