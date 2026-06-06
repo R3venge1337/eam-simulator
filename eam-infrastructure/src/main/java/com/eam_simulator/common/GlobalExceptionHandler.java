@@ -1,6 +1,6 @@
 package com.eam_simulator.common;
 
-import com.eam_simulator.engine.exceptions.DomainException;
+import com.eam_simulator.domain.DomainException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

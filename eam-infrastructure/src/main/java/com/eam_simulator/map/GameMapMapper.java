@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class GameMapMapper {
-    public GameMapJpaEntity toJpaEntity(GameMap domain) {
-        if(Objects.isNull(domain)){
+class GameMapMapper {
+    GameMapJpaEntity toJpaEntity(GameMap domain) {
+        if (Objects.isNull(domain)) {
             return null;
         }
 
@@ -18,8 +18,8 @@ public class GameMapMapper {
         return jpaEntity;
     }
 
-    public GameMap toDomain(GameMapJpaEntity entity) {
-        if(Objects.isNull(entity)){
+    GameMap toDomain(GameMapJpaEntity entity) {
+        if (Objects.isNull(entity)) {
             return null;
         }
 
@@ -39,7 +39,7 @@ public class GameMapMapper {
         jpaEntity.setName(domain.getMapName().name());
         jpaEntity.setWidth(domain.getSize().width());
         jpaEntity.setHeight(domain.getSize().height());
-        jpaEntity.setGrid(mapToDomainTile(domain.getSize().width(),domain.getSize().height(),domain.getGrid()));
+        jpaEntity.setGrid(mapToDomainTile(domain.getSize().width(), domain.getSize().height(), domain.getGrid()));
         return jpaEntity;
     }
 
@@ -56,16 +56,16 @@ public class GameMapMapper {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 MapTile dto = dtoGrid[x][y];
-                domainGrid[x][y] = new Tile(dto.coords());
+                domainGrid[x][y] = new Tile(dto.coords(), dto.terrain(), dto.elevation(), dto.passageType(), dto.walkable());
             }
         }
     }
 
-    private static MapTile[][] mapToDomainTile(int width, int height,Tile[][] mapTiles){
+    private static MapTile[][] mapToDomainTile(int width, int height, Tile[][] mapTiles) {
         MapTile[][] tiles = new MapTile[width][height];
-        for (int i=0; i < width; i++ ){
-            for(int y=0; y < height;y++){
-                tiles[i][y] = new MapTile(mapTiles[i][y].getCoords());
+        for (int i = 0; i < width; i++) {
+            for (int y = 0; y < height; y++) {
+                tiles[i][y] = new MapTile(mapTiles[i][y].getCoords(), mapTiles[i][y].getTerrain(), mapTiles[i][y].getElevation(), mapTiles[i][y].getPassage(), mapTiles[i][y].isWalkable());
             }
         }
         return tiles;

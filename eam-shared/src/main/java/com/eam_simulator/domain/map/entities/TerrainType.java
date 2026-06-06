@@ -1,4 +1,4 @@
-package com.eam_simulator.engine.entities;
+package com.eam_simulator.domain.map.entities;
 
 public enum TerrainType {
     GRASS,
@@ -6,9 +6,8 @@ public enum TerrainType {
     WATER,
     SHALLOW_WATER,
     MOUNTAIN,
-    SINKHOLE,
+    RAVINE,
     HILL,
     SNOW,
     SAND,
-    FOREST_FLOOR
 }

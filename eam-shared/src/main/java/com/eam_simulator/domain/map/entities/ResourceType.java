@@ -1,4 +1,4 @@
-package com.eam_simulator.engine.entities;
+package com.eam_simulator.domain.map.entities;
 
 public enum ResourceType {
     NONE,

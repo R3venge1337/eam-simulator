@@ -1,9 +1,9 @@
 package com.eam_simulator.map;
 
-import com.eam_simulator.engine.entities.Coordinates;
-import com.eam_simulator.engine.entities.PassageType;
-import com.eam_simulator.engine.entities.ResourceType;
-import com.eam_simulator.engine.entities.TerrainType;
+import com.eam_simulator.domain.map.entities.Coordinates;
+import com.eam_simulator.domain.map.entities.PassageType;
+import com.eam_simulator.domain.map.entities.ResourceType;
+import com.eam_simulator.domain.map.entities.TerrainType;
 
 class Tile {
     private final Coordinates coords;
@@ -27,14 +27,37 @@ class Tile {
         this.walkable = true;
     }
 
-    boolean isWalkable() { return walkable; }
-
-    void changeTerrain(TerrainType terrain) {
+    public Tile(Coordinates coords, TerrainType terrain, int elevation, PassageType passageType, boolean walkable) {
+        this.coords = coords;
         this.terrain = terrain;
-        this.walkable = (terrain != TerrainType.WATER) && (terrain != TerrainType.MOUNTAIN);
+        this.elevation = elevation;
+        this.walkable = walkable;
+    }
+
+    void shapeTerrain(TerrainType terrain, int elevation, PassageType passageType, boolean isWalkable) {
+        this.terrain = terrain;
+        this.elevation = elevation;
+        this.passage = passageType;
+        this.walkable = isWalkable;
+    }
+
+    TerrainType getTerrain() {
+        return terrain;
+    }
+
+    int getElevation() {
+        return elevation;
+    }
+
+    boolean isWalkable() {
+        return walkable;
     }
 
     public Coordinates getCoords() {
         return coords;
+    }
+
+    PassageType getPassage() {
+        return passage;
     }
 }

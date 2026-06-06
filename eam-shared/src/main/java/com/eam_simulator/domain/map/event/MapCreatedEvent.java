@@ -1,6 +1,6 @@
-package com.eam_simulator.engine.event;
+package com.eam_simulator.domain.map.event;
 
-import com.eam_simulator.engine.DomainEvent;
+import com.eam_simulator.domain.DomainEvent;
 
 import java.time.Instant;
 import java.util.UUID;

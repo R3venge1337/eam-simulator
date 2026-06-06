@@ -1,4 +1,4 @@
-package com.eam_simulator.engine.exceptions;
+package com.eam_simulator.domain;
 
 import java.util.UUID;
 

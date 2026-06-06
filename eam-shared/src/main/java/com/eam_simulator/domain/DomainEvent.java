@@ -1,4 +1,4 @@
-package com.eam_simulator.engine;
+package com.eam_simulator.domain;
 
 import java.time.Instant;
 

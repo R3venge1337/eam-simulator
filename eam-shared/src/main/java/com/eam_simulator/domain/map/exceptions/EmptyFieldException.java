@@ -1,4 +1,6 @@
-package com.eam_simulator.engine.exceptions;
+package com.eam_simulator.domain.map.exceptions;
+
+import com.eam_simulator.domain.DomainException;
 
 public class EmptyFieldException extends DomainException {
     public EmptyFieldException(String message) {
