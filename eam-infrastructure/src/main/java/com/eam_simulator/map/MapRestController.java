@@ -28,6 +28,6 @@ class MapRestController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new CreateMapResponse(mapView.mapName(), mapView.size(), mapView.tiles()));
+                .body(new CreateMapResponse(mapView.mapName(), mapView.size(), mapView.tiles(), mapView.structures(), mapView.units()));
     }
 }
