@@ -19,7 +19,8 @@ class MapRequestMapper {
         return new CreateMapCommand(
                 request.mapName(),
                 request.size(),
-                envSettings
+                envSettings,
+                request.totalPlayers()
         );
     }
 }
