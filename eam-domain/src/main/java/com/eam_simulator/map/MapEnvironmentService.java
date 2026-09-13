@@ -14,6 +14,7 @@ public class MapEnvironmentService {
         for (Object config : activeConfigs) {
             Class<Object> type = (Class<Object>) config.getClass();
             context.register(type, config);
+            System.out.println("Rejestruje: " + config.getClass().getName());
         }
 
         try {

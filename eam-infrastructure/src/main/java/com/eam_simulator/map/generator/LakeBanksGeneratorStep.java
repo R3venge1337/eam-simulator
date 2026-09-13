@@ -1,6 +1,7 @@
 package com.eam_simulator.map.generator;
 
 import com.eam_simulator.domain.map.entities.Coordinates;
+import com.eam_simulator.domain.map.entities.PassageType;
 import com.eam_simulator.domain.map.entities.TerrainType;
 import com.eam_simulator.map.*;
 import com.eam_simulator.map.dto.SandGenerationSettings;
@@ -43,14 +44,16 @@ class LakeBanksGeneratorStep implements MapGenerationStep {
 
                 TileSnapshot currentTile = context.getTileSnapshot(x, y);
 
-                if (currentTile.terrain() == TerrainType.GRASS && currentTile.elevation() <= 1) {
+                // OCHRONA: Plaże stawiamy wyłącznie na czystej trawie (GRASS) na niskim poziomie
+                if (currentTile.terrain() != TerrainType.GRASS || currentTile.elevation() > 1) {
+                    continue;
+                }
 
-                    if (isNearWater(x, y, beachRadius, context)) {
-                        Coordinates coords = new Coordinates(x, y);
+                if (isNearWater(x, y, beachRadius, context)) {
+                    Coordinates coords = new Coordinates(x, y);
 
-                        modifications.add(new TerrainModification(coords, TerrainType.SAND, 0,null,true));
-                        sandContext.registerSandTile();
-                    }
+                    modifications.add(new TerrainModification(coords, TerrainType.SAND, 0, PassageType.FREE, true));
+                    sandContext.registerSandTile();
                 }
             }
         }
@@ -78,4 +81,5 @@ class LakeBanksGeneratorStep implements MapGenerationStep {
         }
         return false;
     }
+
 }

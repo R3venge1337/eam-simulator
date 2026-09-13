@@ -22,7 +22,7 @@ public class MapGenerationContext {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                gridSnapshot[x][y] = new TileSnapshot(TerrainType.GRASS, 0,null,true);
+                gridSnapshot[x][y] = new TileSnapshot(TerrainType.GRASS, 0,PassageType.FREE,true);
             }
         }
     }

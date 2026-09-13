@@ -1,4 +1,4 @@
 package com.eam_simulator.map.dto;
 
-public record CreateMapRequest(String mapName, MapDimension size, GenerationSettingsRequest settings) {
+public record CreateMapRequest(String mapName, MapDimension size, GenerationSettingsRequest settings, int totalPlayers) {
 }

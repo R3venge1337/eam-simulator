@@ -2,9 +2,34 @@ package com.eam_simulator.domain.map.entities;
 
 public enum ResourceType {
     NONE,
-    WOOD,
-    STONE,
-    GOLD,
+
+    TREE_TRUNKS,
+    TIMBER,
+    STONES,
+    IRON_ORE,
     IRON,
-    COAL
+    GOLD_ORE,
+    GOLD,
+    COAL,
+
+    CORN,
+    FLOUR,
+    LOAVES,
+    PIGS,
+    SKINS,
+    SAUSAGES,
+    WINE_BARRELS,
+
+    WOODEN_SHIELD,
+    LONG_SHIELD,
+    LEATHER,
+    LEATHER_ARMOR,
+    IRON_ARMAMENT,
+    HAND_AXE,
+    SWORD,
+    LANCE,
+    PIKE,
+    LONGBOW,
+    CROSSBOW,
+    HORSES
 }

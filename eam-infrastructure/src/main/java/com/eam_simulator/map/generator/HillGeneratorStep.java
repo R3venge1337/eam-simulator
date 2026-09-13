@@ -1,16 +1,14 @@
 package com.eam_simulator.map.generator;
 
 import com.eam_simulator.domain.map.entities.Coordinates;
+import com.eam_simulator.domain.map.entities.PassageType;
 import com.eam_simulator.domain.map.entities.TerrainType;
 import com.eam_simulator.map.*;
 import com.eam_simulator.map.dto.HillGenerationSettings;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Component
 @Order(4)
@@ -20,79 +18,127 @@ class HillGeneratorStep implements MapGenerationStep {
     @Override
     public List<TerrainModification> execute(MapGenerationContext context) {
         List<TerrainModification> modifications = new ArrayList<>();
-        Optional<HillGenerationContext> hillCtxOpt = context.get(HillGenerationContext.class);
 
-        if (hillCtxOpt.isEmpty()) return modifications;
+        Optional<HillGenerationContext> hillCtxOpt = context.get(HillGenerationContext.class);
+        Optional<HillGenerationSettings> settingsOpt = context.get(HillGenerationSettings.class);
+
+        if (hillCtxOpt.isEmpty() || settingsOpt.isEmpty() || !settingsOpt.get().enableHills()) {
+            return modifications;
+        }
+
         HillGenerationContext hillContext = hillCtxOpt.get();
+        HillGenerationSettings settings = settingsOpt.get();
 
         int width = context.getWidth();
         int height = context.getHeight();
         int totalTiles = context.getTotalTiles();
 
-        Optional<HillGenerationSettings> settingsOpt = context.get(HillGenerationSettings.class);
-        if (settingsOpt.isEmpty() || !settingsOpt.get().enableHills()) {
-            return modifications;
-        }
-        HillGenerationSettings settings = settingsOpt.get();
+        Set<Coordinates> generatedHillTiles = new HashSet<>();
 
-        while (hillContext.canGenerateMoreTiles(totalTiles)) {
+        int maxAttempts = 200;
+        int attempts = 0;
+
+        while (hillContext.canGenerateMoreTiles(totalTiles) && attempts < maxAttempts) {
+            attempts++;
+
             int centerX = random.nextInt(width);
             int centerY = random.nextInt(height);
 
-            int radius = random.nextInt(settings.maxHillRadius() - settings.minHillRadius() + 1) + settings.minHillRadius();
+            int minR = settings.minHillRadius();
+            int maxR = settings.maxHillRadius();
+            int radiusX = random.nextInt(maxR - minR + 1) + minR;
+            int radiusY = random.nextInt(maxR - minR + 1) + minR;
 
             double entranceAngle = (random.nextDouble() * 2 * Math.PI) - Math.PI;
+            double entranceWidth = settings.entranceWidth();
 
-            for (int dx = -radius; dx <= radius; dx++) {
-                for (int dy = -radius; dy <= radius; dy++) {
+            // Próg wewnętrzny określający grubość ścianki zewnętrznej (ok. 1.2 kafelka od krawędzi)
+            double minRadius = Math.min(radiusX, radiusY);
+            double innerRatioThreshold = Math.max(0.0, (minRadius - 1.2) / minRadius);
+
+            boolean addedAnyNewTile = false;
+
+            for (int dx = -radiusX; dx <= radiusX; dx++) {
+                for (int dy = -radiusY; dy <= radiusY; dy++) {
                     int targetX = centerX + dx;
                     int targetY = centerY + dy;
 
-                    if (targetX >= 0 && targetX < width && targetY >= 0 && targetY < height) {
-                        double distance = Math.sqrt(dx * dx + dy * dy);
+                    if (isOutOfBounds(targetX, targetY, width, height)) {
+                        continue;
+                    }
 
-                        if (distance <= radius && hillContext.canGenerateMoreTiles(totalTiles)) {
+                    double ellipseDistance = Math.pow((double) dx / radiusX, 2) + Math.pow((double) dy / radiusY, 2);
 
-                            double tileAngle = Math.atan2(dy, dx);
+                    if (ellipseDistance <= 1.0) {
+                        Coordinates coords = new Coordinates(targetX, targetY);
 
-                            double angleDiff = Math.abs(tileAngle - entranceAngle);
-                            if (angleDiff > Math.PI) {
-                                angleDiff = (2 * Math.PI) - angleDiff;
-                            }
+                        if (generatedHillTiles.contains(coords)) {
+                            continue;
+                        }
 
-                            int targetElevation;
-                            TerrainType targetTerrain;
-                            boolean forceNonWalkable = false;
+                        // Kąt kafelka względem środka wzgórza
+                        double tileAngle = Math.atan2(dy, dx);
+                        double angleDiff = Math.abs(tileAngle - entranceAngle);
+                        if (angleDiff > Math.PI) {
+                            angleDiff = (2 * Math.PI) - angleDiff;
+                        }
 
-                            if (angleDiff < settings.entranceWidth()) {
-                                targetElevation = 1;
-                                targetTerrain = TerrainType.HILL;
-                            } else {
-                                targetElevation = 1;
-                                targetTerrain = TerrainType.HILL;
-                                forceNonWalkable = true;
-                            }
+                        // Znormalizowany promień (0.0 = środek, 1.0 = zewnętrzny brzeg elipsy)
+                        double normRadius = Math.sqrt(ellipseDistance);
 
-                            TileSnapshot currentTile = context.getTileSnapshot(targetX, targetY);
+                        // Krawędź zewnętrzna (klif)
+                        boolean isOuterEdge = normRadius >= innerRatioThreshold;
 
-                            if (currentTile.elevation() <= targetElevation) {
-                                Coordinates coords = new Coordinates(targetX, targetY);
-                                TerrainModification mod = new TerrainModification(
-                                        coords,
-                                        targetTerrain,
-                                        targetElevation,
-                                        null,
-                                        forceNonWalkable
-                                );
+                        // Wejście/Rampa na krawędzi
+                        boolean isEntrance = isOuterEdge && (angleDiff <= (entranceWidth / 2.0));
 
-                                modifications.add(mod);
-                                hillContext.registerHillTile();
+                        // Blokujemy TYLKO zewnętrzną krawędź, chyba że jest to wejście
+                        boolean isCliff = isOuterEdge && !isEntrance;
+
+                        PassageType passageType = isCliff ? PassageType.BLOCKED : PassageType.FREE;
+                        boolean isWalkable = !isCliff;
+
+                        TileSnapshot currentTile = context.getTileSnapshot(targetX, targetY);
+
+                        if (currentTile.terrain() != TerrainType.GRASS) {
+                            continue;
+                        }
+
+                        if (currentTile.elevation() == 0) {
+                            int targetElevation = 1;
+
+                            modifications.add(new TerrainModification(
+                                    coords,
+                                    TerrainType.HILL,
+                                    targetElevation,
+                                    passageType,
+                                    isWalkable
+                            ));
+
+                            generatedHillTiles.add(coords);
+                            hillContext.registerHillTile();
+                            addedAnyNewTile = true;
+
+                            if (!hillContext.canGenerateMoreTiles(totalTiles)) {
+                                break;
                             }
                         }
                     }
                 }
+                if (!hillContext.canGenerateMoreTiles(totalTiles)) {
+                    break;
+                }
+            }
+
+            if (addedAnyNewTile) {
+                attempts = 0;
             }
         }
+
         return modifications;
+    }
+
+    private boolean isOutOfBounds(int x, int y, int width, int height) {
+        return x < 0 || x >= width || y < 0 || y >= height;
     }
 }
