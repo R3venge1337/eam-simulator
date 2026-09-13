@@ -32,6 +32,7 @@ class Tile {
         this.terrain = terrain;
         this.elevation = elevation;
         this.walkable = walkable;
+        this.passage = passageType;
     }
 
     void shapeTerrain(TerrainType terrain, int elevation, PassageType passageType, boolean isWalkable) {
