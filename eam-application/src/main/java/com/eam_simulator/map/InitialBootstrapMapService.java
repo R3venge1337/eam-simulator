@@ -1,5 +1,7 @@
 package com.eam_simulator.map;
 
+import com.eam_simulator.engine.TickEmitted;
+import com.eam_simulator.engine.Tickable;
 import com.eam_simulator.map.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -7,10 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @RequiredArgsConstructor
-class InitialBootstrapMapService implements MapFacade {
+class InitialBootstrapMapService implements MapFacade, Tickable {
 
     private final GameMapRepository gameMapRepository;
     private final ApplicationEventPublisher springEventPublisher;
@@ -50,6 +53,9 @@ class InitialBootstrapMapService implements MapFacade {
             activeConfigs.add(new SandGenerationContext());
         }
 
+        FactionGenerationContext factionContext = new FactionGenerationContext(command.totalPlayers());
+        activeConfigs.add(factionContext);
+
         environmentService.generate(gameMap, this.pipeline, activeConfigs);
 
         GameMap savedMap = gameMapRepository.save(gameMap);
@@ -61,10 +67,16 @@ class InitialBootstrapMapService implements MapFacade {
         TileView[][] viewGrid = new TileView[width][height];
         mapDomainTilesToView(width, height, savedMap.getGrid(), viewGrid);
 
+        List<StructureView> structureViews = mapStructuresToView(factionContext.getAllStructures());
+        List<UnitsView> unitsViews = mapUnitsToView(factionContext.getAllUnits());
+
         return new MapView(
                 savedMap.getMapName().name(),
                 new MapDimension(command.size().width(), command.size().height()),
-                viewGrid
+                viewGrid,
+                structureViews,
+                unitsViews
+
         );
     }
 
@@ -75,5 +87,36 @@ class InitialBootstrapMapService implements MapFacade {
                 viewGrid[x][y] = new TileView(domainTile.getCoords(), domainTile.getTerrain(), domainTile.getElevation(), domainTile.getPassage(), domainTile.isWalkable());
             }
         }
+    }
+
+    private List<StructureView> mapStructuresToView(List<StartingStructureData> structures) {
+        return structures.stream()
+                .map(s -> new StructureView(
+                        UUID.randomUUID(),
+                        s.ownerId(),
+                        s.type(),
+                        s.coordinates(),
+                        s.type().getDimensions(),
+                        s.health(),
+                        s.maxHealth(),
+                        s.startingResources()
+                ))
+                .toList();
+    }
+
+    private List<UnitsView> mapUnitsToView(List<StartingUnitData> units) {
+        return units.stream()
+                .map(u -> new UnitsView(
+                        UUID.randomUUID(), // Tymczasowe ID widoku dla wygenerowanej jednostki
+                        u.ownerId(),
+                        u.type(),
+                        u.coordinates()
+                ))
+                .toList();
+    }
+
+    @Override
+    public void onTick(TickEmitted tick) {
+
     }
 }
